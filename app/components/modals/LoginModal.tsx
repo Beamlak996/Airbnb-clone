@@ -2,8 +2,8 @@
 import { AiFillGithub } from "react-icons/ai";
 import { FcGoogle } from "react-icons/fc";
 import { useForm, FieldValues, SubmitHandler } from "react-hook-form";
-import { useRegisterModal } from "../hooks/useRegisterModal";
-import { useLoginModal } from "../hooks/useLoginModal";
+import { useRegisterModal } from "../../hooks/useRegisterModal";
+import { useLoginModal } from "../../hooks/useLoginModal";
 import { useCallback, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -19,10 +19,10 @@ const LoginModal = () => {
   const loginModal = useLoginModal();
   const [isLoading, setIsLoading] = useState(false);
 
-  const onToggle = useCallback(()=>{
-    loginModal.onClose()
-    registerModal.onOpen()
-  }, [loginModal, registerModal])
+  const onToggle = useCallback(() => {
+    loginModal.onClose();
+    registerModal.onOpen();
+  }, [loginModal, registerModal]);
 
   const {
     register,
@@ -37,7 +37,7 @@ const LoginModal = () => {
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     setIsLoading(true);
-    console.log("error")
+    console.log("error");
 
     signIn("credentials", {
       ...data,
@@ -56,8 +56,6 @@ const LoginModal = () => {
       }
     });
   };
-
-
 
   const bodyContent = (
     <div className='flex flex-col gap-4'>
@@ -89,7 +87,7 @@ const LoginModal = () => {
         outline
         label='Continue with Google'
         icon={FcGoogle}
-        onClick={() => signIn('google')}
+        onClick={() => signIn("google")}
       />
       {/* <Button
         outline

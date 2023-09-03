@@ -1,16 +1,16 @@
 "use client";
-import { SafeUser } from "@/app/types";
-import { Listing, Reservation } from "@prisma/client";
+import { SafeListings, SafeUser } from "@/app/types";
+import { Reservation } from "@prisma/client";
 import { useRouter } from "next/navigation";
-import useCountries from "../hooks/useCountries";
+import useCountries from "../../hooks/useCountries";
 import { useCallback, useMemo } from "react";
-import { format } from "date-fns"
+import { format } from "date-fns";
 import Image from "next/image";
 import HeartButton from "../HeartButton";
 import Button from "../Button";
 
 type ListingCardProps = {
-  data: Listing;
+  data: SafeListings;
   reservation?: Reservation;
   onAction?: (id: string) => void;
   disabled?: boolean;
@@ -24,43 +24,46 @@ const ListingCard = ({
   reservation,
   onAction,
   disabled,
-  actionLabel = '',
+  actionLabel = "",
   actionId,
   currentUser,
 }: ListingCardProps) => {
   const router = useRouter();
-  const { getByValue } = useCountries()
-  const location = getByValue(data.locationValue)
+  const { getByValue } = useCountries();
+  const location = getByValue(data.locationValue);
 
-  const handleCancel = useCallback((e: React.MouseEvent<HTMLButtonElement>)=>{
-    e.stopPropagation()
-    if(disabled){
-        return
+  const handleCancel = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.stopPropagation();
+      if (disabled) {
+        return;
+      }
+      onAction?.(actionLabel);
+    },
+    [onAction, actionLabel, disabled]
+  );
+
+  const price = useMemo(() => {
+    if (reservation) {
+      return reservation.totalPrice;
     }
-    onAction?.(actionLabel)
-  }, [onAction, actionLabel, disabled])
+    return data.price;
+  }, [reservation, data.price]);
 
-  const price = useMemo(()=>{
-    if(reservation){
-        return reservation.totalPrice
+  const reservationDate = useMemo(() => {
+    if (!reservation) {
+      return null;
     }
-    return data.price
-  }, [reservation, data.price])
+    const start = new Date(reservation.startDate);
+    const end = new Date(reservation.endDate);
 
-  const reservationDate = useMemo(()=>{
-    if(!reservation){
-        return null
-    }
-    const start = new Date(reservation.startDate)
-    const end = new Date(reservation.endDate)
-
-    return `${format(start, 'PP')} - ${format(end, 'PP')}`
-  }, [reservation])
+    return `${format(start, "PP")} - ${format(end, "PP")}`;
+  }, [reservation]);
 
   return (
     <div
       onClick={() => router.push(`/listings/${data.id}`)}
-      className='col-span-1 cursor-poiner group'
+      className='col-span-1 cursor-pointer group'
     >
       <div className='flex flex-col gap-2 w-full'>
         <div className='aspect-square w-full relative overflow-hidden rounded-xl '>
@@ -77,24 +80,21 @@ const ListingCard = ({
         <div className='font-semibold text-lg'>
           {location?.region}, {location?.label}
         </div>
-        <div className="font-light text-neutral-500">
-            { reservationDate || data.category }
+        <div className='font-light text-neutral-500'>
+          {reservationDate || data.category}
         </div>
-        <div className="flex items-center gap-1">
-            <div className="font-semibold" >
-                ${price}
-            </div>
-            {
-                !reservation && (
-                    <div className="font-light">night</div>
-                )
-            }
+        <div className='flex items-center gap-1'>
+          <div className='font-semibold'>${price}</div>
+          {!reservation && <div className='font-light'>night</div>}
         </div>
-        {
-            onAction && actionLabel && (
-                <Button disabled={disabled} small label={actionLabel} onClick={handleCancel} />
-            )
-        }
+        {onAction && actionLabel && (
+          <Button
+            disabled={disabled}
+            small
+            label={actionLabel}
+            onClick={handleCancel}
+          />
+        )}
       </div>
     </div>
   );
