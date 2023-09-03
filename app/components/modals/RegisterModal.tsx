@@ -1,6 +1,5 @@
 "use client";
 import axios from "axios";
-import { AiFillGithub } from "react-icons/ai";
 import { FcGoogle } from "react-icons/fc";
 import { useForm, FieldValues, SubmitHandler } from "react-hook-form";
 import { useRegisterModal } from "../../hooks/useRegisterModal";
@@ -41,8 +40,9 @@ const RegisterModal = () => {
       .post("/api/register", data)
       .then(() => {
         registerModal.onClose();
+        loginModal.onOpen()
       })
-      .catch((error) => {
+      .catch(() => {
         toast.error("Something went wrong");
       })
       .finally(() => {
@@ -90,7 +90,6 @@ const RegisterModal = () => {
         icon={FcGoogle}
         onClick={() => signIn("google")}
       />
-      {/* <Button outline label="Continue with Github" icon={AiFillGithub} onClick={()=>signIn('github')} /> */}
       <div className='text-neutral-500 text-center mt-4 font-light '>
         <div className='flex items-center justify-center gap-2'>
           <div>Already have an account?</div>
